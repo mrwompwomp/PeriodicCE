@@ -74,14 +74,13 @@ int main(void)
     
     char electronegList[472] = "2.20N/A 0.981.572.042.553.043.443.98N/A 0.931.311.611.9 2.192.583.16N/A 0.821   1.361.541.631.661.551.831.881.911.9 1.651.812.012.182.552.963   0.820.951.221.331.6 2.161.9 2.2 2.282.2 1.931.691.781.962.052.1 2.662.6 0.790.891.1 1.121.131.14N/A 1.17N/A 1.2 N/A 1.221.231.241.25N/A 1.271.3 1.5 2.361.9 2.2 2.2 2.282.542   1.622.332.022   2.2 N/A 0.7 0.9 1.1 1.3 1.5 1.381.361.281.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A ";
     
-    char groups[176] = "non-metal       alkali metal    alkaline metal  transition metalother metal     metaloid        halogen         noble gas       unknown         lanthanoid      actinoid        ";
+    char *groups[11] = {"non-metal", "alkali metal", "alkaline metal", "transition metal", "other metal", "metaloid", "halogen", "noble gas", "unknown", "lanthanoid", "actinoid"};
     
     char* substr = malloc(2);
     char* atomName = malloc(12);
     char* currAtomMass = malloc(6);
     char* currDensity = malloc(5);
     char* currElectroneg = malloc(4);
-    char* currElementType = malloc(16);
     
     
     uint8_t mainArr[10][18] = {
@@ -115,9 +114,8 @@ int main(void)
       for(int j=0;j<18;j++) {
           tempAtom = mainArr[i][j];
           if (tempAtom){
-              tempElementType = GetElementType(tempAtom);
               strncpy(substr, symbols+2*(tempAtom-1), 2);
-              gfx_SetColor(colors[tempElementType]);
+              gfx_SetColor(colors[GetElementType(tempAtom)-1]);
               tempPosX = 8+17*j;
               tempPosY = 32+17*i;
               
@@ -201,8 +199,7 @@ int main(void)
             
             gfx_PrintStringXY("Group:", 50, 65);
             tempElementType = GetElementType(currAtom);
-            strncpy(currElementType, groups+16*(tempElementType-1), 16);
-            gfx_PrintStringXY(currElementType, 96, 65);
+            gfx_PrintStringXY(groups[tempElementType-1], 96, 65);
             
             gfx_PrintStringXY("Number:", 50, 25);
             gfx_SetTextXY(105, 25);
@@ -217,4 +214,3 @@ int main(void)
     
     return 0;
 }
-
