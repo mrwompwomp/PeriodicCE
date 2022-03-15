@@ -3,44 +3,34 @@
 #include <keypadc.h>
 #include <string.h>
 
-int isElementPresent(uint8_t elementList[], int listLength, int atomicNumber) {
-    bool isElementPresent = false;
-    for (uint8_t i = 0; i < listLength; i++) {
-        if (elementList[i] == atomicNumber) {
-            isElementPresent = true;
-            break;
-        }
-    }
-    return isElementPresent;
-}
 
 int GetElementType(int atomicNumber) {
     uint8_t nonMetals[7] = {1,6,7,8,15,16,34};
-    if (isElementPresent(nonMetals,7,atomicNumber)) {
+    if (memchr(nonMetals,atomicNumber,7)) {
         return 1;
     }
     uint8_t nobleGases[6] = {2,10,18,36,54,86};
-    if (isElementPresent(nobleGases,6,atomicNumber)) {
+    if (memchr(nobleGases,atomicNumber,6)) {
         return 8;
     }
     uint8_t alkaliMetals[6] = {3,11,19,37,55,87};
-    if (isElementPresent(alkaliMetals,6,atomicNumber)) {
+    if (memchr(alkaliMetals,atomicNumber,6)) {
         return 2;
     }
     uint8_t alkalineMetals[6] = {4,12,20,38,56,88};
-    if (isElementPresent(alkalineMetals,6,atomicNumber)) {
+    if (memchr(alkalineMetals,atomicNumber,6)) {
         return 3;
     }
     uint8_t halogens[5] = {9,17,35,53,85};
-    if (isElementPresent(halogens,5,atomicNumber)) {
+    if (memchr(halogens,atomicNumber,5)) {
         return 7;
     }
     uint8_t metaloids[7] = {5,14,32,33,51,52,84};
-    if (isElementPresent(metaloids,7,atomicNumber)) {
+    if (memchr(metaloids,atomicNumber,7)) {
         return 6;
     }
     uint8_t other[7] = {13,31,49,50,81,82,83};
-    if (isElementPresent(other,7,atomicNumber)) {
+    if (memchr(other,atomicNumber,7)) {
         return 5;
     }
     if (atomicNumber>56 && atomicNumber<72){
@@ -179,7 +169,7 @@ int main(void)
                 strncpy(atomName, atomNameList+12*(currAtom-1), 12);
                 gfx_PrintStringXY(atomName, 90, 215);
             }
-            gfx_SetColor(colors[GetElementType(currAtom)]);
+            gfx_SetColor(colors[GetElementType(currAtom)-1]);
             gfx_FillRectangle_NoClip(40, 205, 32, 32);
             strncpy(substr, symbols+2*(currAtom-1), 2);
             gfx_PrintStringXY(substr,41+(9*(substr[1]==' ')), 214);
@@ -214,3 +204,4 @@ int main(void)
     
     return 0;
 }
+
