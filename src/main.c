@@ -3,6 +3,8 @@
 #include <keypadc.h>
 #include <string.h>
 
+#define DETAILS_SCREEN 0x0
+#define TABLE_SCREEN 0x1
 
 int GetElementType(int atomicNumber) {
     uint8_t nonMetals[7] = {1,6,7,8,15,16,34};
@@ -45,29 +47,153 @@ int GetElementType(int atomicNumber) {
     return 3;
 }
 
+typedef struct
+{
+    char name[13];
+    char symbol[2];
+    char mass[6];
+    char density[5];
+    char electronegativity[4];
+    char melt[6];
+    char boil[6];
+}Element;
+
 int main(void)
 {
-    static const char atomNameList[1416] = "Hydrogen    Helium      Lithium     Beryllium   Boron       Carbon      Nitrogen    Oxygen      Fluorine    Neon        Sodium      Magnesium   Aluminium   Silicon     Phosphorus  Sulfur      Chlorine    Argon       Potassium   Calcium     Scandium    Titanium    Vanadium    Chromium    Manganese   Iron        Cobalt      Nickel      Copper      Zinc        Gallium     Germanium   Arsenic     Selenium    Bromine     Krypton     Rubidium    Strontium   Yttrium     Zirconium   Niobium     Molybdenum  Technetium  Ruthenium   Rhodium     Palladium   Silver      Cadmium     Indium      Tin         Antimony    Tellurium   Iodine      Xenon       Cesium      Barium      Lanthanum   Cerium      PraseodymiumNeodymium   Promethium  Samarium    Europium    Gadolinium  Terbium     Dysprosium  Holmium     Erbium      Thulium     Ytterbium   Lutetium    Hafnium     Tantalum    Tungsten    Rhenium     Osmium      Iridium     Platinium   Gold        Mercury     Thallium    Lead        Bismuth     Polonium    Astatine    Radon       Francium    Radium      Actinium    Thorium     ProtactiniumUranium     Neptunium   Plutonium   Americium   Curium      Berkelium   Californium Einsteinium Fermium     Mendelevium Nobelium    Lawrencium              Dubnium     Seaborgium  Bohrium     Hassium     Meitnerium  DarmstadtiumRoentgenium Copernicium Nihonium    Flerovium   Moscovium   Livermorium Tennessine  Oganesson   ";
+
+    static const Element elements[118] = {
+        {"Hydrogen     ", "H ", "1.0079", "0.09 ", "2.20", "13.99 ", "20.271"},
+        {"Helium       ", "He", "4.0026", "0.179", "N/A ", "0.95  ", "4.222 "},
+        {"Lithium      ", "Li", "6.941 ", "0.535", "0.98", "453.65", "1603  "},
+        {"Beryllium    ", "Be", "9.0122", "1.848", "1.57", "1560  ", "3243  "},
+        {"Boron        ", "B ", "10.81 ", "2.46 ", "2.04", "2349  ", "4200  "},
+        {"Carbon       ", "C ", "12.011", "2.26 ", "2.55", "N/A   ", "3915  "},
+        {"Nitrogen     ", "N ", "14.007", "1.251", "3.04", "63.15 ", "77.355"},
+        {"Oxygen       ", "O ", "15.999", "1.429", "3.44", "54.36 ", "90.188"},
+        {"Fluorine     ", "F ", "18.998", "1.696", "3.98", "53.48 ", "85.03 "},
+        {"Neon         ", "Ne", "20.18 ", "0.9  ", "N/A ", "24.56 ", "27.104"},
+        {"Sodium       ", "Na", "22.99 ", "0.968", "0.93", "370.94", "1156.1"},
+        {"Magnesium    ", "Mg", "24.305", "1.738", "1.31", "923   ", "1363  "},
+        {"Aluminium    ", "Al", "26.982", "2.7  ", "1.61", "933.47", "2743  "},
+        {"Silicon      ", "Si", "28.086", "2.33 ", "1.9 ", "1687  ", "3538  "},
+        {"Phosphorus   ", "P ", "30.974", "1.823", "2.19", "N/A   ", "N/A   "},
+        {"Sulfur       ", "S ", "32.066", "1.96 ", "2.58", "388.36", "717.8 "},
+        {"Chlorine     ", "Cl", "35.453", "3.214", "3.16", "171.6 ", "239.11"},
+        {"Argon        ", "Ar", "39.948", "1.784", "N/A ", "83.81 ", "87.302"},
+        {"Potassium    ", "K ", "39.098", "0.856", "0.82", "336.7 ", "1032  "},
+        {"Calcium      ", "Ca", "40.078", "1.55 ", "1.00", "1115  ", "1757  "},
+        {"Scandium     ", "Sc", "44.956", "2.985", "1.36", "1814  ", "3109  "},
+        {"Titanium     ", "Ti", "47.867", "4.507", "1.54", "1941  ", "3560  "},
+        {"Vanadium     ", "V ", "50.942", "6.11 ", "1.63", "2183  ", "3680  "},
+        {"Chromium     ", "Cr", "51.996", "7.14 ", "1.66", "2180  ", "2944  "},
+        {"Manganese    ", "Mn", "54.938", "7.47 ", "1.55", "1519  ", "2334  "},
+        {"Iron         ", "Fe", "55.845", "7.874", "1.83", "1811  ", "3134  "},
+        {"Cobalt       ", "Co", "58.933", "8.9  ", "1.88", "1768  ", "3200  "},
+        {"Nickel       ", "Ni", "58.693", "8.908", "1.91", "1728  ", "3003  "},
+        {"Copper       ", "Cu", "36.546", "8.92 ", "1.9 ", "1357.8", "2835  "},
+        {"Zinc         ", "Zn", "65.39 ", "7.14 ", "1.65", "692.68", "1180  "},
+        {"Gallium      ", "Ga", "69.723", "5.904", "1.81", "302.91", "2673  "},
+        {"Germanium    ", "Ge", "72.61 ", "5.323", "2.01", "1211.4", "3106  "},
+        {"Arsenic      ", "As", "74.922", "5.727", "2.18", "N/A   ", "887   "},
+        {"Selenium     ", "Se", "78.96 ", "4.819", "2.55", "494   ", "958   "},
+        {"Bromine      ", "Br", "79.904", "3.12 ", "2.96", "265.8 ", "332.0 "},
+        {"Krypton      ", "Kr", "83.8  ", "3.75 ", "3.00", "115.78", "119.93"},
+        {"Rubidium     ", "Rb", "85.468", "1.532", "0.82", "312.45", "961   "},
+        {"Strontium    ", "Sr", "87.62 ", "2.63 ", "0.95", "1050  ", "1650  "},
+        {"Yttrium      ", "Y ", "88.906", "4.472", "1.22", "1799  ", "3203  "},
+        {"Zirconium    ", "Zr", "91.224", "6.511", "1.33", "2128  ", "4650  "},
+        {"Niobium      ", "Nb", "92.906", "8.57 ", "1.6 ", "2750  ", "5017  "},
+        {"Molybdenum   ", "Mo", "95.94 ", "10.28", "2.16", "2896  ", "4912  "},
+        {"Technetium   ", "Tc", "[98]  ", "11.5 ", "1.9 ", "2430  ", "4538  "},
+        {"Ruthenium    ", "Ru", "101.07", "12.37", "2.2 ", "2607  ", "4423  "},
+        {"Rhodium      ", "Rh", "102.91", "12.45", "2.28", "2237  ", "3968  "},
+        {"Palladium    ", "Pd", "106.42", "12.02", "2.2 ", "1828.1", "3236  "},
+        {"Silver       ", "Ag", "107.87", "10.49", "1.93", "1234.9", "2435  "},
+        {"Cadmium      ", "Cd", "112.41", "8.65 ", "1.69", "594.22", "1040  "},
+        {"Indium       ", "In", "114.82", "7.31 ", "1.78", "429.75", "2345  "},
+        {"Tin          ", "Sn", "118.71", "7.31 ", "1.96", "505.08", "2875  "},
+        {"Antimony     ", "Sb", "121.76", "6.697", "2.05", "903.78", "1908  "},
+        {"Tellurium    ", "Te", "127.6 ", "6.24 ", "2.1 ", "722.66", "1261  "},
+        {"Iodine       ", "I ", "126.91", "4.94 ", "2.66", "386.85", "457.4 "},
+        {"Xenon        ", "Xe", "131.29", "5.9  ", "2.6 ", "161.40", "165.05"},
+        {"Cesium       ", "Cs", "132.91", "1.879", "0.79", "301.7 ", "944   "},
+        {"Barium       ", "Ba", "137.33", "3.51 ", "0.89", "1000  ", "2118  "},
+        {"Lanthanum    ", "La", "138.91", "6.146", "1.1 ", "1193  ", "3737  "},
+        {"Cerium       ", "Ce", "140.12", "6.689", "1.12", "1068  ", "3716  "},
+        {"Praseodymium ", "Pr", "140.91", "6.64 ", "1.13", "1208  ", "3403  "},
+        {"Neodymium    ", "Nd", "144.24", "7.01 ", "1.14", "1297  ", "3347  "},
+        {"Promethium   ", "Pm", "[145] ", "7.264", "N/A ", "1315  ", "3273  "},
+        {"Samarium     ", "Sm", "150.36", "7.353", "1.17", "1345  ", "2173  "},
+        {"Europium     ", "Eu", "151.97", "5.244", "N/A ", "1099  ", "1802  "},
+        {"Gadolinium   ", "Gd", "157.25", "7.901", "1.2 ", "1585  ", "3273  "},
+        {"Terbium      ", "Tb", "158.93", "8.219", "N/A ", "1629  ", "3396  "},
+        {"Dysprosium   ", "Dy", "162.5 ", "8.551", "1.22", "1680  ", "2840  "},
+        {"Holmium      ", "Ho", "164.93", "8.795", "1.23", "1734  ", "2873  "},
+        {"Erbium       ", "Er", "167.26", "9.066", "1.24", "1802  ", "3141  "},
+        {"Thulium      ", "Tm", "168.93", "9.321", "1.25", "1818  ", "2003  "},
+        {"Ytterbium    ", "Yb", "173.04", "6.57 ", "N/A ", "1097  ", "1469  "},
+        {"Lutetium     ", "Lu", "174.97", "9.841", "1.27", "1925  ", "3675  "},
+        {"Hafnium      ", "Hf", "178.49", "13.31", "1.3 ", "2506  ", "4876  "},
+        {"Tantalum     ", "Ta", "180.95", "16.65", "1.5 ", "3290  ", "5731  "},
+        {"Tungsten     ", "W ", "183.84", "19.25", "2.36", "3695  ", "6203  "},
+        {"Rhenium      ", "Re", "186.21", "21.02", "1.9 ", "3459  ", "5869  "},
+        {"Osmium       ", "Os", "190.23", "22.61", "2.2 ", "3306  ", "5285  "},
+        {"Iridium      ", "Ir", "192.22", "22.65", "2.2 ", "2719  ", "4403  "},
+        {"Platinium    ", "Pt", "195.08", "21.09", "2.28", "2041.4", "4098  "},
+        {"Gold         ", "Au", "196.97", "19.3 ", "2.54", "1337.3", "3243  "},
+        {"Mercury      ", "Hg", "200.59", "13.53", "2.00", "234.32", "629.88"},
+        {"Thallium     ", "Tl", "204.38", "11.85", "1.62", "577   ", "1746  "},
+        {"Lead         ", "Pb", "207.2 ", "11.34", "2.33", "600.61", "2022  "},
+        {"Bismuth      ", "Bi", "208.98", "9.78 ", "2.02", "544.7 ", "1837  "},
+        {"Polonium     ", "Po", "[209] ", "9.196", "2.00", "527   ", "1235  "},
+        {"Astatine     ", "At", "[210] ", "N/A  ", "2.2 ", "575   ", "610   "},
+        {"Radon        ", "Rn", "[222] ", "9.73 ", "N/A ", "202   ", "211.5 "},
+        {"Francium     ", "Fr", "[223] ", "N/A  ", "0.7 ", "300   ", "950   "},
+        {"Radium       ", "Ra", "[226] ", "5    ", "0.9 ", "1233  ", "2010  "},
+        {"Actinium     ", "Ac", "[227] ", "10.07", "1.1 ", "1500  ", "3500  "},
+        {"Thorium      ", "Th", "232.04", "11.72", "1.3 ", "2023  ", "5061  "},
+        {"Protactinium ", "Pa", "231.04", "15.37", "1.5 ", "1841  ", "4300  "},
+        {"Uranium      ", "U ", "238.03", "19.05", "1.38", "1405.3", "4404  "},
+        {"Neptunium    ", "Np", "[237] ", "20.45", "1.36", "912   ", "4447  "},
+        {"Plutonium    ", "Pu", "[244] ", "19.82", "1.28", "912.5 ", "3505  "},
+        {"Americium    ", "Am", "[243] ", "N/A  ", "1.3 ", "1449  ", "2880  "},
+        {"Curium       ", "Cm", "[247] ", "13.51", "1.3 ", "1613  ", "3383  "},
+        {"Berkelium    ", "Bk", "[247] ", "14.78", "1.3 ", "1259  ", "2900  "},
+        {"Californium  ", "Cf", "[251] ", "15.1 ", "1.3 ", "1173  ", "1743  "},
+        {"Einsteinium  ", "Es", "[252] ", "8.84 ", "1.3 ", "1133  ", "1269  "},
+        {"Fermium      ", "Fm", "[257] ", "N/A  ", "1.3 ", "1800  ", "N/A   "},
+        {"Mendelevium  ", "Md", "[258] ", "N/A  ", "1.3 ", "1100  ", "N/A   "},
+        {"Nobelium     ", "No", "[259] ", "N/A  ", "1.3 ", "1100  ", "N/A   "},
+        {"Lawrencium   ", "Lr", "262.11", "N/A  ", "1.3 ", "1900  ", "N/A   "},
+        {"Rutherfordium", "Rf", "265.12", "23.2 ", "N/A ", "2400  ", "5800  "},
+        {"Dubnium      ", "Db", "268.13", "29.3 ", "N/A ", "N/A   ", "N/A   "},
+        {"Seaborgium   ", "Sg", "271.13", "35   ", "N/A ", "N/A   ", "N/A   "},
+        {"Bohrium      ", "Bh", "[270] ", "37.1 ", "N/A ", "N/A   ", "N/A   "},
+        {"Hassium      ", "Hs", "277.15", "40.7 ", "N/A ", "N/A   ", "N/A   "},
+        {"Meitnerium   ", "Mt", "276.15", "37.4 ", "N/A ", "N/A   ", "N/A   "},
+        {"Darmstadtium ", "Ds", "281.16", "34.8 ", "N/A ", "N/A   ", "N/A   "},
+        {"Roentgenium  ", "Rg", "280.16", "28.7 ", "N/A ", "N/A   ", "N/A   "},
+        {"Copernicium  ", "Cn", "285.17", "23.7 ", "N/A ", "N/A   ", "357   "},
+        {"Nihonium     ", "Nh", "284.18", "16   ", "N/A ", "700   ", "1430  "},
+        {"Flerovium    ", "Fl", "289.19", "14   ", "N/A ", "340   ", "420   "},
+        {"Moscovium    ", "Mc", "288.19", "13.5 ", "N/A ", "670   ", "1400  "},
+        {"Livermorium  ", "Lv", "[293] ", "12.9 ", "N/A ", "708.5 ", "1085  "},
+        {"Tennessine   ", "Ts", "[294] ", "7.2  ", "N/A ", "673   ", "823   "},
+        {"Oganesson    ", "Og", "[294] ", "5    ", "N/A ", "N/A   ", "350   "}
+    };
     
     static const uint8_t colors[11] = {7,228,230,234,241,29,23,157,149,47,217};
     int tempAtom;
     int tempPosX;
     int tempPosY;
     kb_key_t key;
-
-    static const char symbols[236] = "H HeLiBeB C N O F NeNaMgAlSiP S ClArK CaScTiV CrMnFeCoNiCuZnGaGeAsSeBrKrRbSrY ZrNbMoTcRuRhPdAgCdInSnSbTeI XeCsBaLaCePrNdPmSmEuGdTbDyHoErTmYbLuHfTaW ReOsIrPtAuHgTlPbBiPoAtRnFrRaAcThPaU NpPuAmCmBkCfEsFmMdNoLrRfDbSgBhHsMtDsRgCnNhFlMcLvTsOg";
-    
-    static const char atomicMasses[708] = "1.00794.00266.941 9.012210.81 12.01114.00715.99918.99820.18 22.99 24.30526.98228.08630.97432.06635.45339.94839.09840.07844.95647.86750.94251.99654.93855.84558.93358.69336.54665.39 69.72372.61 74.92278.96 79.90483.8  85.46887.62 88.90691.22492.90695.94 98    101.07102.91106.42107.87112.41114.82118.71121.76127.6 126.91131.29132.91137.33138.91140.12140.91144.24145   150.36151.97157.25158.93162.5 164.93167.26168.93173.04174.97178.49180.95183.84186.21190.23192.22195.08196.97200.59204.38207.2 208.98209   210   222   223   226   227   232.04231.04238.03237   244   243   247   247   251   252   257   258   259   262.11265.12268.13271.13270   277.15276.15281.16280.16285.17284.18289.19288.19293   294   294   ";
-    
-    static const char desnityList[590] = "0.09 0.1790.5351.8482.46 2.26 1.2511.4291.6960.9  0.9681.7382.7  2.33 1.8231.96 3.2141.7840.8561.55 2.9854.5076.11 7.14 7.47 7.8748.9  8.9088.92 7.14 5.9045.3235.7274.8193.12 3.75 1.5322.63 4.4726.5118.57 10.2811.5 12.3712.4512.0210.498.65 7.31 7.31 6.6976.24 4.94 5.9  1.8793.51 6.1466.6896.64 7.01 7.2647.3535.2447.9018.2198.5518.7959.0669.3216.57 9.84113.3116.6519.2521.0222.6122.6521.0919.3 13.5311.8511.349.78 9.196N/A  9.73 N/A  5    10.0711.7215.3719.0520.4519.82N/A  13.5114.7815.1 8.84 N/A  N/A  N/A  N/A  23.2 29.3 35   37.1 40.7 37.4 34.8 28.7 23.7 16   14   13.5 12.9 7.2  5    ";
-    
-    static const char electronegList[472] = "2.20N/A 0.981.572.042.553.043.443.98N/A 0.931.311.611.9 2.192.583.16N/A 0.821   1.361.541.631.661.551.831.881.911.9 1.651.812.012.182.552.963   0.820.951.221.331.6 2.161.9 2.2 2.282.2 1.931.691.781.962.052.1 2.662.6 0.790.891.1 1.121.131.14N/A 1.17N/A 1.2 N/A 1.221.231.241.25N/A 1.271.3 1.5 2.361.9 2.2 2.2 2.282.542   1.622.332.022   2.2 N/A 0.7 0.9 1.1 1.3 1.5 1.381.361.281.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A N/A ";
+    kb_key_t enterKey;
     
     static const char *groups[11] = {"non-metal", "alkali metal", "alkaline metal", "transition metal", "other metal", "metaloid", "halogen", "noble gas", "unknown", "lanthanoid", "actinoid"};
     
     char* substr = malloc(2);
-    char* atomName = malloc(12);
-    char* currAtomMass = malloc(6);
+    char* tempStringBig = malloc(13);
+    char* tempStringSmall = malloc(6);
     char* currDensity = malloc(5);
     char* currElectroneg = malloc(4);
     
@@ -96,47 +222,55 @@ int main(void)
     gfx_PrintStringXY("Periodic Table CE", 50, 3);
     gfx_PrintStringXY("X", 298, 215);
     gfx_SetTextScale(1,1);
-    
-    //Draw the table
-    for(int i=0; i<10; i++) {
-      for(int j=0;j<18;j++) {
-          tempAtom = mainArr[i][j];
-          if (tempAtom){
-              strncpy(substr, symbols+2*(tempAtom-1), 2);
-              gfx_SetColor(colors[GetElementType(tempAtom)]);
-              tempPosX = 8+17*j;
-              tempPosY = 32+17*i;
-              
-              gfx_FillRectangle_NoClip(tempPosX, tempPosY, 16, 16);
-              tempPosX += (4*(substr[1]==' '));
-              gfx_PrintStringXY(substr,tempPosX, tempPosY+4);
-          }
-        }
-    }
-    gfx_SetColor(255);
-    gfx_Line_NoClip(50,175,55,175);
-    gfx_Line_NoClip(50,191,55,191);
-    gfx_Line_NoClip(50,122,50,191);
-    
     //Initialize starting position 
     int i = 1;
     int j = 0;
     int first = true;
-    bool prevkey = false;
     int currAtom;
+    bool prevArrowKey = false;
+    bool prevEnterKey = false;
+    bool redrawTable = true;
+    bool screen;
     
     do
     {
         kb_Scan();
         key = kb_Data[7];
+        enterKey = kb_Data[6];
+        if (redrawTable){
+            gfx_SetColor(0);
+            gfx_FillRectangle_NoClip(0,25,320,180);
+            //Draw the table
+            for(int i=0; i<10; i++) {
+                for(int j=0;j<18;j++) {
+                    tempAtom = mainArr[i][j];
+                    if (tempAtom){
+                        strncpy(substr, elements[tempAtom-1].symbol, 2);
+                        gfx_SetColor(colors[GetElementType(tempAtom)]);
+                        tempPosX = 8+17*j;
+                        tempPosY = 32+17*i;
+                        gfx_FillRectangle_NoClip(tempPosX, tempPosY, 16, 16);
+                        tempPosX += (4*(substr[1]==' '));
+                        gfx_PrintStringXY(substr,tempPosX, tempPosY+4);
+                    }
+                }
+            }
+            gfx_SetColor(255);
+            gfx_Line_NoClip(50,175,55,175);
+            gfx_Line_NoClip(50,191,55,191);
+            gfx_Line_NoClip(50,122,50,191);
+            gfx_Rectangle_NoClip(7+17*j,31+17*i,18,18);
+            redrawTable = false;
+            screen = TABLE_SCREEN;
+        }
+        
         if (first){
             key = kb_Up;
             first = false;
         }
-        if (key && !prevkey) {
+        if (key && !prevArrowKey && screen == TABLE_SCREEN) {
             gfx_SetColor(0);
             gfx_Rectangle_NoClip(7+17*j,31+17*i,18,18);
-            gfx_FillRectangle_NoClip(50,25,160,50);
             gfx_FillRectangle_NoClip(40, 205, 250, 32);
             do {
                 switch (key)
@@ -159,47 +293,56 @@ int main(void)
             gfx_SetColor(255);
             gfx_Rectangle_NoClip(7+17*j,31+17*i,18,18);
 
-            //the only atom whos name is 13 chars long
             gfx_SetTextScale(2,2);
-            if (currAtom == 104){
-                gfx_PrintStringXY("Rutherfordium",90, 215);
-            } else {
-                strncpy(atomName, atomNameList+12*(currAtom-1), 12);
-                gfx_PrintStringXY(atomName, 90, 215);
-            }
+            strncpy(tempStringBig, elements[currAtom-1].name, 13);
+            gfx_PrintStringXY(tempStringBig, 90, 215);
             
             gfx_SetColor(colors[GetElementType(currAtom)]);
             gfx_FillRectangle_NoClip(40, 205, 32, 32);
-            strncpy(substr, symbols+2*(currAtom-1), 2);
-            gfx_PrintStringXY(substr,41+(9*(substr[1]==' ')), 214);
+            strncpy(substr, elements[currAtom-1].symbol, 2);
+            gfx_PrintStringXY(substr,41+(8*(substr[1]==' ')), 214);
+        }
+        if (enterKey && !prevEnterKey){
+            redrawTable = !screen;
+            gfx_SetColor(0);
+            gfx_FillRectangle_NoClip(0,25,320,180);
             gfx_SetTextScale(1,1);
 
-            strncpy(currAtomMass, atomicMasses+6*(currAtom-1), 6);
-            gfx_PrintStringXY("Mass:", 50, 35);
-            gfx_PrintStringXY(currAtomMass, 88, 35);
+            strncpy(tempStringSmall, elements[currAtom-1].mass, 6);
+            gfx_PrintStringXY("Mass: ", 50, 35);
+            gfx_PrintString(tempStringSmall);
 
-            gfx_PrintStringXY("Density:               g/l", 50, 45);
-            strncpy(currDensity, desnityList+5*(currAtom-1), 5);
-            gfx_PrintStringXY(currDensity, 109, 45);
+            gfx_PrintStringXY("Density: ", 50, 45);
+            strncpy(currDensity, elements[currAtom-1].density, 5);
+            gfx_PrintString(currDensity);
+            gfx_PrintString(" g/l");
             
-            gfx_PrintStringXY("EN.:", 50, 55);
-            strncpy(currElectroneg, electronegList+4*(currAtom-1), 4);
-            gfx_PrintStringXY(currElectroneg, 76, 55);
+            gfx_PrintStringXY("EN.: ", 50, 55);
+            strncpy(currElectroneg, elements[currAtom-1].electronegativity, 4);
+            gfx_PrintString(currElectroneg);
             
-            gfx_PrintStringXY("Group:", 50, 65);
-            gfx_PrintStringXY(groups[GetElementType(currAtom)], 96, 65);
+            gfx_PrintStringXY("Group: ", 50, 65);
+            gfx_PrintString(groups[GetElementType(currAtom)]);
             
-            gfx_PrintStringXY("Number:", 50, 25);
-            gfx_SetTextXY(105, 25);
+            gfx_PrintStringXY("Number: ", 50, 25);
             gfx_PrintInt(currAtom,1+(currAtom>9)+(currAtom>99));
+            
+            gfx_PrintStringXY("Melt: ", 50, 75);
+            strncpy(tempStringSmall, elements[currAtom-1].boil, 6);
+            gfx_PrintString(tempStringSmall);
+            
+            gfx_PrintStringXY("Boil: ", 50, 85);
+            strncpy(tempStringSmall, elements[currAtom-1].melt, 6);
+            gfx_PrintString(tempStringSmall);
+
+            screen = DETAILS_SCREEN;
         }
-        prevkey = key;
-  
+        prevArrowKey = key;
+        prevEnterKey = enterKey;
+            
     } while (kb_Data[1] != kb_Graph && kb_Data[6] != kb_Clear);
     
     gfx_End();
-    kb_Reset();
     
     return 0;
 }
-
