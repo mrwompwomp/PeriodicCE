@@ -6,45 +6,22 @@
 #define DETAILS_SCREEN 0x0
 #define TABLE_SCREEN 0x1
 
-int GetElementType(int atomicNumber) {
+int GetElementType(int atomicNumber, int i, int j) {
     uint8_t nonMetals[7] = {1,6,7,8,15,16,34};
-    if (memchr(nonMetals,atomicNumber,7)) {
-        return 0;
-    }
-    uint8_t nobleGases[6] = {2,10,18,36,54,86};
-    if (memchr(nobleGases,atomicNumber,6)) {
-        return 7;
-    }
-    uint8_t alkaliMetals[6] = {3,11,19,37,55,87};
-    if (memchr(alkaliMetals,atomicNumber,6)) {
-        return 1;
-    }
-    uint8_t alkalineMetals[6] = {4,12,20,38,56,88};
-    if (memchr(alkalineMetals,atomicNumber,6)) {
+    if (memchr(nonMetals,atomicNumber,7)) 
         return 2;
-    }
-    uint8_t halogens[5] = {9,17,35,53,85};
-    if (memchr(halogens,atomicNumber,5)) {
-        return 6;
-    }
-    uint8_t metaloids[7] = {5,14,32,33,51,52,84};
-    if (memchr(metaloids,atomicNumber,7)) {
-        return 5;
-    }
-    uint8_t other[7] = {13,31,49,50,81,82,83};
-    if (memchr(other,atomicNumber,7)) {
-        return 4;
-    }
-    if (atomicNumber>56 && atomicNumber<72){
-        return 9;
-    }
-    if (atomicNumber>88 && atomicNumber<104){
+    if (i > 7)
+        return i;
+    if (atomicNumber > 112)
         return 10;
-    }
-    if (atomicNumber>112){
-        return 8;
-    }
-    return 3;
+    if (j > 15) 
+        return j - 10;
+    if (j < 2) 
+        return j;
+    if (j > 1 && j < 12)
+        return 3;
+    uint8_t metaloids[7] = {5,14,32,33,51,52,84};
+    return 4+(!memchr(metaloids,atomicNumber,7));
 }
 
 typedef struct
@@ -56,9 +33,9 @@ typedef struct
     char electronegativity[5];
     char melt[7];
     char boil[7];
-    int year;
-    int radius;
-    int firstIon;
+    uint16_t year;
+    uint8_t radius;
+    uint16_t firstIon;
 }Element;
 
 int main(void)
@@ -185,14 +162,16 @@ int main(void)
         {"Oganesson    ", "Og", "[294] ", "5    ", "N/A ", "N/A   ", "350   ", 2002, 157, 860}
     };
     
-    static const uint8_t colors[11] = {7,228,230,234,241,29,23,157,149,47,217};
-    int tempAtom;
+    static const uint8_t colors[11] = {228,230,7,234,29,241,23,157,47,217,149};
+    uint8_t tempAtom;
     int tempPosX;
-    int tempPosY;
+    uint8_t tempPosY;
     kb_key_t key;
     kb_key_t enterKey;
     
-    static const char *groups[11] = {"non-metal", "alkali metal", "alkaline metal", "transition metal", "other metal", "metaloid", "halogen", "noble gas", "unknown", "lanthanoid", "actinoid"};
+    static const uint8_t nonNobleGases[5] = {1, 7, 8, 9, 17};
+    
+    static const char *groups[11] = {"alkali metal", "alkaline metal", "non-metal", "transition metal", "metaloid", "other metal", "halogen", "noble gas", "lanthanoid", "actinoid", "unknown"};
     
     static const uint8_t mainArr[10][18] = {
         {1  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,2  },
@@ -222,13 +201,9 @@ int main(void)
     //Initialize starting position 
     int i = 1;
     int j = 0;
-    int first = true;
     int currAtom;
-    bool prevArrowKey = false;
-    bool prevEnterKey = false;
-    bool redrawTable = true;
-    bool screen;
-    Element currElement;
+    bool first = true, redrawTable = true, prevArrowKey = false, prevEnterKey = false, screen;
+    const Element* el;
     
     do
     {
@@ -240,18 +215,19 @@ int main(void)
             gfx_FillRectangle_NoClip(0,25,320,180);
             //Draw the table
             for(int i=0; i<10; i++) {
+                tempPosY = 32+17*i;
                 for(int j=0;j<18;j++) {
                     tempAtom = mainArr[i][j];
                     if (tempAtom){
-                        gfx_SetColor(colors[GetElementType(tempAtom)]);
+                        gfx_SetColor(colors[GetElementType(tempAtom, i, j)]);
                         tempPosX = 8+17*j;
-                        tempPosY = 32+17*i;
                         gfx_FillRectangle_NoClip(tempPosX, tempPosY, 16, 16);
                         tempPosX += (4*(elements[tempAtom-1].symbol[1]==' '));
                         gfx_PrintStringXY(elements[tempAtom-1].symbol,tempPosX, tempPosY+4);
                     }
                 }
             }
+
             gfx_SetColor(255);
             gfx_Line_NoClip(50,175,55,175);
             gfx_Line_NoClip(50,191,55,191);
@@ -285,18 +261,19 @@ int main(void)
                            j -= 1-18*(!j);
                         break;
                 }
-            } while (!mainArr[i][j]);
-            currAtom = mainArr[i][j];
-            currElement = elements[currAtom-1];
+                currAtom = mainArr[i][j];
+            } while (!currAtom);
+            
+            el = &elements[currAtom-1];
             gfx_SetColor(255);
             gfx_Rectangle_NoClip(7+17*j,31+17*i,18,18);
 
             gfx_SetTextScale(2,2);
-            gfx_PrintStringXY(currElement.name, 90, 215);
+            gfx_PrintStringXY(el->name, 90, 215);
             
-            gfx_SetColor(colors[GetElementType(currAtom)]);
+            gfx_SetColor(colors[GetElementType(currAtom, i, j)]);
             gfx_FillRectangle_NoClip(40, 205, 32, 32);
-            gfx_PrintStringXY(currElement.symbol,41+(8*(currElement.symbol[1]==' ')), 214);
+            gfx_PrintStringXY(el->symbol,41 + (8*(el->symbol[1]==' ')), 214);
         }
         if (enterKey && !prevEnterKey){
             redrawTable = !screen;
@@ -304,39 +281,56 @@ int main(void)
             gfx_SetTextScale(1,1);
 
             gfx_PrintStringXY("Mass: ", 50, 35);
-            gfx_PrintString(currElement.mass);
-
-            gfx_PrintStringXY("Density: ", 50, 45);
-            gfx_PrintString(currElement.density);
-            gfx_PrintString(" g/l");
+            gfx_PrintString(el->mass);
             
-            gfx_PrintStringXY("Electronegativity: ", 50, 55);
-            gfx_PrintString(currElement.electronegativity);
+            gfx_PrintStringXY("Electronegativity: ", 50, 65);
+            gfx_PrintString(el->electronegativity);
             
-            gfx_PrintStringXY("Group: ", 50, 65);
-            gfx_PrintString(groups[GetElementType(currAtom)]);
+            gfx_PrintStringXY("Group: ", 50, 75);
+            gfx_PrintString(groups[GetElementType(currAtom, i, j)]);
             
             gfx_PrintStringXY("Atomic #: ", 50, 25);
-            gfx_PrintInt(currAtom,1+(currAtom>9)+(currAtom>99));
+            gfx_PrintUInt(currAtom,1+(currAtom>9)+(currAtom>99));
             
-            gfx_PrintStringXY("Melt: ", 50, 75);
-            gfx_PrintString(currElement.boil);
+            gfx_PrintStringXY("State: ", 50, 45);
+            isAGas = false;
+            if (GetElementType(currAtom, i, j) == 7 || memchr(nonNobleGases, currAtom, 5)){
+                gfx_PrintString("Gas");
+            } else {
+                if (currAtom == 35 || currAtom == 80)
+                {
+                    gfx_PrintString("Liquid");
+                } else {
+                    if (currAtom > 103){
+                        gfx_PrintString("Unknown");
+                    } else {
+                        gfx_PrintString("Solid");
+                    }
+                }
+            }
+                
+            gfx_PrintStringXY("Density: ", 50, 55);
+            gfx_PrintString(el->density);
+            gfx_PrintString(" g/l");
+
+            gfx_PrintStringXY("Melt: ", 50, 85);
+            gfx_PrintString(el->boil);
             
-            gfx_PrintStringXY("Boil: ", 50, 85);
-            gfx_PrintString(currElement.melt);
+            gfx_PrintStringXY("Boil: ", 50, 95);
+            gfx_PrintString(el->melt);
             
-            gfx_PrintStringXY("Year Discovered: ", 50, 95);
-            if (currElement.year){
-                gfx_PrintInt(currElement.year,4);
+            gfx_PrintStringXY("Year Discovered: ", 50, 105);
+            if (el->year){
+                gfx_PrintUInt(el->year, 4);
             } else {
                 gfx_PrintString("ANCIENT");
             }
             
-            gfx_PrintStringXY("Radius: ", 50, 105);
-            gfx_PrintInt(currElement.radius, 2+(currElement.radius > 99));
+            gfx_PrintStringXY("Radius: ", 50, 115);
+            gfx_PrintUInt(el->radius, 2+(el->radius > 99));
             
-            gfx_PrintStringXY("1st Ion: ", 50, 115);
-            gfx_PrintInt(currElement.firstIon, 3+(currElement.firstIon > 999));
+            gfx_PrintStringXY("1st Ion: ", 50, 125);
+            gfx_PrintUInt(el->firstIon, 3+(el->firstIon > 999));
             
             screen = DETAILS_SCREEN;
         }
