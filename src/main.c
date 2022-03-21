@@ -202,7 +202,7 @@ int main(void)
     int i = 1;
     int j = 0;
     int currAtom;
-    bool first = true, redrawTable = true, prevArrowKey = false, prevEnterKey = false, screen;
+    bool first = true, redrawTable = true, prevArrowKey = false, prevEnterKey = false, isAGas, screen;
     const Element* el;
     
     do
@@ -275,7 +275,7 @@ int main(void)
             gfx_FillRectangle_NoClip(40, 205, 32, 32);
             gfx_PrintStringXY(el->symbol,41 + (8*(el->symbol[1]==' ')), 214);
         }
-        if (enterKey && !prevEnterKey){
+        if (enterKey == kb_Enter && !prevEnterKey){
             redrawTable = !screen;
             gfx_FillRectangle_NoClip(0,25,320,180);
             gfx_SetTextScale(1,1);
@@ -296,6 +296,7 @@ int main(void)
             isAGas = false;
             if (GetElementType(currAtom, i, j) == 7 || memchr(nonNobleGases, currAtom, 5)){
                 gfx_PrintString("Gas");
+                isAGas = true;
             } else {
                 if (currAtom == 35 || currAtom == 80)
                 {
@@ -311,13 +312,18 @@ int main(void)
                 
             gfx_PrintStringXY("Density: ", 50, 55);
             gfx_PrintString(el->density);
-            gfx_PrintString(" g/l");
-
+            if (isAGas){
+                gfx_PrintString(" g/l");
+            } else {
+                gfx_PrintString(" g/cm3");
+            }
             gfx_PrintStringXY("Melt: ", 50, 85);
             gfx_PrintString(el->boil);
+            gfx_PrintString(" K.");
             
             gfx_PrintStringXY("Boil: ", 50, 95);
             gfx_PrintString(el->melt);
+            gfx_PrintString(" K.");
             
             gfx_PrintStringXY("Year Discovered: ", 50, 105);
             if (el->year){
@@ -331,6 +337,7 @@ int main(void)
             
             gfx_PrintStringXY("1st Ion: ", 50, 125);
             gfx_PrintUInt(el->firstIon, 3+(el->firstIon > 999));
+            gfx_PrintString(" kJ/mol");
             
             screen = DETAILS_SCREEN;
         }
