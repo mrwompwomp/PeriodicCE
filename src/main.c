@@ -317,6 +317,7 @@ int main(void)
             
             gfx_PrintStringXY("Radius: ", 50, 115);
             gfx_PrintUInt(el->radius, 2+(el->radius > 99));
+            gfx_PrintString(" pm");
             
             gfx_PrintStringXY("1st Ion: ", 50, 125);
             gfx_PrintUInt(el->firstIon, 3+(el->firstIon > 999));
