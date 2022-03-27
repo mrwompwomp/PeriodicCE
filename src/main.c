@@ -150,8 +150,7 @@ int main(void)
     uint8_t tempAtom;
     int tempPosX;
     uint8_t tempPosY;
-    kb_key_t key;
-    kb_key_t enterKey;
+    kb_key_t key, enterKey;
     
     static const uint8_t nonNobleGases[5] = {1, 7, 8, 9, 17};
     
@@ -183,10 +182,8 @@ int main(void)
     gfx_PrintStringXY("X", 298, 215);
     gfx_SetTextScale(1,1);
     //Initialize starting position 
-    int i = 1;
-    int j = 0;
-    int currAtom;
-    bool first = true, redrawTable = true, prevArrowKey = false, prevEnterKey = false, isAGas, screen;
+    int i = 1, j = 0, currAtom = 1, initialPosI = 1, initialPosJ = 0;
+    bool first = true, redrawTable = true, prevArrowKey = false, prevEnterKey = false, arrowOnDetails = false, isAGas, screen;
     const Element* el;
     
     do
@@ -208,14 +205,22 @@ int main(void)
                         gfx_FillRectangle_NoClip(tempPosX, tempPosY, 16, 16);
                         tempPosX += (4*(elements[tempAtom-1].symbol[1]==' ') + 2*(elements[tempAtom-1].symbol[1]=='i') + 2*(elements[tempAtom-1].symbol[1]=='l'));
                         gfx_PrintStringXY(elements[tempAtom-1].symbol,tempPosX, tempPosY+4);
+                        if (tempAtom == currAtom && !first){
+                            //in case the cursor position changed when we were on the details screen
+                            initialPosI = i;
+                            initialPosJ = j;
+                        }
                     }
                 }
             }
-
+            i = initialPosI;
+            j = initialPosJ;
+            
             gfx_SetColor(255);
-            gfx_Line_NoClip(50,175,55,175);
-            gfx_Line_NoClip(50,191,55,191);
-            gfx_Line_NoClip(50,122,50,191);
+
+            gfx_HorizLine_NoClip(50,175,5);
+            gfx_HorizLine_NoClip(50,191,5);
+            gfx_VertLine_NoClip(50,122,69);
             gfx_Rectangle_NoClip(7+17*j,31+17*i,18,18);
             redrawTable = false;
             screen = TABLE_SCREEN;
@@ -251,27 +256,41 @@ int main(void)
             el = &elements[currAtom-1];
             gfx_SetColor(255);
             gfx_Rectangle_NoClip(7+17*j,31+17*i,18,18);
-
+        }
+        
+        if ((key && !prevArrowKey) || arrowOnDetails) {
+            //redraw the element name and box at the bottom of the screen
             gfx_SetTextScale(2,2);
             gfx_PrintStringXY(el->name, 90, 215);
-            
             gfx_SetColor(colors[el->group]);
             gfx_FillRectangle_NoClip(40, 205, 32, 32);
             gfx_PrintStringXY(el->symbol,41 + (8*(el->symbol[1]==' ') + 3*(el->symbol[1]=='i') + 3*(el->symbol[1]=='l')), 214);
+            gfx_SetColor(0);
+            arrowOnDetails = false;
         }
-        if (enterKey == kb_Enter && !prevEnterKey){
-            redrawTable = !screen;
-            gfx_FillRectangle_NoClip(0,25,320,180);
-            gfx_SetTextScale(1,1);
 
+        if (key && !prevArrowKey && screen == DETAILS_SCREEN && (key == kb_Left || key == kb_Right)) {
+            currAtom += (key == kb_Right) - (key == kb_Left);
+            currAtom += 118*(!currAtom) - 118*(currAtom == 119);
+            enterKey = kb_Enter;
+            el = &elements[currAtom-1];
+            arrowOnDetails = true;
+            gfx_FillRectangle_NoClip(40, 205, 250, 32);
+        }
+        
+        if (enterKey == kb_Enter && !prevEnterKey){
+            if (!arrowOnDetails){
+                //only redraw the table if we aren't changing elements on the details screen
+                redrawTable = !screen;
+            }
+            gfx_FillRectangle_NoClip(0,25,320,180);
+            gfx_SetTextScale(2,2);
+            gfx_PrintStringXY(">   <", 300, 35);
+            //gfx_PrintStringXY("<", 10, 35);
+            gfx_SetTextScale(1,1);
+            
             gfx_PrintStringXY("Mass: ", 50, 35);
             gfx_PrintString(el->mass);
-            
-            gfx_PrintStringXY("Electronegativity: ", 50, 85);
-            gfx_PrintString(el->electronegativity);
-            
-            gfx_PrintStringXY("Group: ", 50, 95);
-            gfx_PrintString(groups[el->group]);
             
             gfx_PrintStringXY("Atomic #: ", 50, 25);
             gfx_PrintUInt(currAtom,1+(currAtom>9)+(currAtom>99));
@@ -299,7 +318,7 @@ int main(void)
             
             gfx_PrintStringXY("Neutrons: ", 50, 65);
             gfx_PrintUInt(el->neutrons, 1+(el->neutrons>9)+(el->neutrons>99));
-                
+            
             gfx_PrintStringXY("Density: ", 50, 75);
             gfx_PrintString(el->density);
             if (isAGas){
@@ -307,6 +326,13 @@ int main(void)
             } else {
                 gfx_PrintString(" g/cm3");
             }
+            
+            gfx_PrintStringXY("Electronegativity: ", 50, 85);
+            gfx_PrintString(el->electronegativity);
+            
+            gfx_PrintStringXY("Group: ", 50, 95);
+            gfx_PrintString(groups[el->group]);
+            
             gfx_PrintStringXY("Melt: ", 50, 105);
             gfx_PrintString(el->boil);
             gfx_PrintString(" K.");
@@ -332,6 +358,7 @@ int main(void)
             
             screen = DETAILS_SCREEN;
         }
+        
         prevArrowKey = key;
         prevEnterKey = enterKey;
             
