@@ -6,8 +6,9 @@
 
 #define DETAILS_SCREEN 0x0
 #define TABLE_SCREEN 0x1
-#define FRENCH_LOCAL 0x10C
-#define DUTCH_LOCAL 0x113
+#define FR_LOCAL 0x10C
+#define DE_LOCAL 0x113
+#define ES_LOCAL 0x10A
 
 typedef struct
 {
@@ -156,27 +157,36 @@ int main(void)
     static const char *strings_en[20] = {"Periodic Table CE", "Atomic #: ", "ANCIENT", "Mass: ", "Neutrons: ", "Protons: ", "Radius: ", "1st ion: ", "Electronegativity: ", "Density: ", "Melting Pt.: ", "Boiling Pt.: ", "State: ", "Year discovered: ", "Gas", "Solid", "Liquid", "Unknown", "Group: ", "Oxidation States: "};
     static const char *strings_fr[20] = {"Tableau Periodique CE", "# Atomique: ", "ANCIEN", "Masse: ", "Neutrons: ", "Protons: ", "Rayon: ", "1ere Ionis: ", "Electronegativite: ", "Densite: ", "Pt. Fusion: ", "Pt. Ebullition: ", "Etat: ", "Decouvert: ", "Gaz", "Solide", "Liquide", "Inconnue", "Groupe: ", "Etats d'oxydation: "};
     static const char *strings_de[20] = {"Periodiek Systeem CE", "Atoomnr: ", "ANTIEK", "Massa: ", "Neutronen: ", "Protonen: ", "Straal: ", "1ste ion: ", "Elektronegativiteit: ", "Dichtheid: ", "Smeltpunt: ", "Kookpunt: ", "Aggregatietoestand: ", "Jaar ontdekking: ", "Gas", "Vast", "Vloeibaar", "Onbekend", "Groep: ", "Oxidatietoestand: "};
+    static const char *strings_es[20] = {"Tabla Periodica CE", "# Atomico: ", "DESCONOCIDO", "Peso: ", "Neutrones: ", "Protones: ", "Radio: ", "1er ion: ", "Electronegatividad: ", "Densidad: ", "Pt. Fusion: ", "Pt. Ebullicion: ", "Estado: ", "Descubier: ", "Gas", "Solido", "Liquido", "Desconocida", "Grupo: ", "Estados de oxidacion: "};
     static const char *elementNames_en[118] = {"Hydrogen", "Helium", "Lithium", "Beryllium", "Boron", "Carbon", "Nitrogen", "Oxygen", "Fluorine", "Neon", "Sodium", "Magnesium", "Aluminium", "Silicon", "Phosphorus", "Sulfur", "Chlorine", "Argon", "Potassium", "Calcium", "Scandium", "Titanium", "Vanadium", "Chromium", "Manganese", "Iron", "Cobalt", "Nickel", "Copper", "Zinc", "Gallium", "Germanium", "Arsenic", "Selenium", "Bromine", "Krypton", "Rubidium", "Strontium", "Yttrium", "Zirconium", "Niobium", "Molybdenum", "Technetium", "Ruthenium", "Rhodium", "Palladium", "Silver", "Cadmium", "Indium", "Tin", "Antimony", "Tellurium", "Iodine", "Xenon", "Cesium", "Barium", "Lanthanum", "Cerium", "Praseodymium", "Neodymium", "Promethium", "Samarium", "Europium", "Gadolinium", "Terbium", "Dysprosium", "Holmium", "Erbium", "Thulium", "Ytterbium", "Lutetium", "Hafnium", "Tantalum", "Tungsten", "Rhenium", "Osmium", "Iridium", "Platinium", "Gold", "Mercury", "Thallium", "Lead", "Bismuth", "Polonium", "Astatine", "Radon", "Francium", "Radium", "Actinium", "Thorium", "Protactinium", "Uranium", "Neptunium", "Plutonium", "Americium", "Curium", "Berkelium", "Californium", "Einsteinium", "Fermium", "Mendelevium", "Nobelium", "Lawrencium", "Rutherfordium", "Dubnium", "Seaborgium", "Bohrium", "Hassium", "Meitnerium", "Darmstadtium", "Roentgenium", "Copernicium", "Nihonium", "Flerovium", "Moscovium", "Livermorium", "Tennessine", "Oganesson"};
     static const char *elementNames_fr[118] = {"Hydrogene", "Helium", "Lithium", "Beryllium", "Bore", "Carbone", "Azote", "Oxygene", "Fluor", "Neon", "Sodium", "Magnesium", "Aluminium", "Sillicium", "Phosphore", "Soufre", "Chlore", "Argon", "Potassium", "Calcium", "Scandium", "Titane", "Vanadium", "Chrome", "Manganese", "Fer", "Cobalt", "Nickel", "Cuivre", "Zinc", "Gallium", "Germanium", "Arsenic", "Selenium", "Brome", "Krypton", "Rubidium", "Strontium", "Yttrium", "Zirconium", "Niobium", "Molybdene", "Technetium", "Ruthenium", "Rhodium", "Palladium", "Argent", "Cadmium", "Indium", "Etain", "Antimoine", "Tellure", "Iode", "Xenon", "Cesium", "Baryum", "Lanthane", "Cerium", "Praseodyme", "Neodyme", "Promethium", "Samarium", "Europium", "Gadolinium", "Terbium", "Dysprosium", "Holmium", "Erbium", "Thulium", "Ytterbium", "Lutecium", "Hafnium", "Tantale", "Tungstene", "Rhenium", "Osmium", "Iridium", "Platine", "Or", "Mercure", "Thallium", "Plomb", "Bismuth", "Polonium", "Astate", "Radon", "Francium", "Radium", "Actinium", "Thorium", "Protactinium", "Uranium", "Neptunium", "Plutonium", "Americium", "Curium", "Berkelium", "Californium", "Einsteinium", "Fermium", "Mendelevium", "Nobelium", "Lawrencium", "Rutherfordium", "Dubnium", "Seaborgium", "Bohrium", "Hassium", "Meitnerium", "Darmstadtium", "Roentgenium", "Copernicium", "Nihonium", "Flerovium", "Moscovium", "Livermorium", "Tennesse", "Oganesson"};
     static const char *elementNames_de[118] = {"Waterstof", "Helium", "Lithium", "Beryllium", "Boor", "Koolstof", "Stikstof", "Zuurstof", "Fluor", "Neon", "Natrium", "Magnesium", "Aluminium", "Silicium", "Fosfor", "Zwavel", "Chloor", "Argon", "Kalium", "Calcium", "Scandium", "Titanium", "Vanadium", "Chroom", "Mangaan", "Ijzer", "Kobalt", "Nikkel", "Koper", "Zink", "Gallium", "Germanium", "Arseen", "Seleen", "Broom", "Krypton", "Rubidium", "Strontium", "Yttrium", "Zirkonium", "Niobium", "Molybdeen", "Technetium", "Ruthenium", "Rodium", "Palladium", "Zilver", "Cadmium", "Indium", "Tin", "Antimoon", "Telluur", "Jood", "Xenon", "Cesium", "Barium", "Lanthaan", "Cerium", "Praseodymium", "Neodymium", "Promethium", "Samarium", "Europium", "Gadolinium", "Terbium", "Dysprosium", "Holmium", "Erbium", "Thulium", "Ytterbium", "Lutetium", "Hafnium", "Tantaal", "Wolfraam", "Renium", "Osmium", "Iridium", "Platina", "Goud", "Kwik", "Thallium", "Lood", "Bismut", "Polonium", "Astaat", "Radon", "Francium", "Radium", "Actinium", "Thorium", "Protactinium", "Uranium", "Neptunium", "Plutonium", "Americium", "Curium", "Berkelium", "Californium", "Einsteinium", "Fermium", "Mendelevium", "Nobelium", "Lawrencium", "Rutherfordium", "Dubnium", "Seaborgium", "Bohrium", "Hassium", "Meitnerium", "Darmstadtium", "Rontgenium", "Copernicium", "Nihonium", "Flerovium", "Moscovium", "Livermorium", "Tennessine", "Oganesson"};
-    static const char *groups_en[11] = {"alkali metal", "alkaline metal", "non-metal", "transition metal", "metaloid", "other metal", "halogen", "noble gas", "lanthanoid", "actinoid", "unknown"};
+    static const char *elementNames_es[118] = {"Hidrogeno", "Helio", "Litio", "Berilio", "Boro", "Carbono", "Nitrogeno", "Oxigeno", "Fluor", "Neon", "Sodio", "Magnesio", "Aluminio", "Silicio", "Fosforo", "Azufre", "Cloro", "Argon", "Potasio", "Calcio", "Escandio", "Titanio", "Vanadio", "Cromo", "Manganeso", "Hierro", "Cobalto", "Niquel", "Cobre", "Zinc", "Galio", "Germanio", "Arsenico", "Selenio", "Bromo", "Kripton", "Rubidio", "Estroncio", "Itrio", "Zirconio", "Niobio", "Molibdeno", "Tecnecio", "Rutenio", "Rodio", "Paladio", "Plata", "Cadmio", "Indio", "Estano", "Antimonio", "Telurio", "Yodo", "Xenon", "Cesio", "Bario", "Lantano", "Cerio", "Praseodimio", "Neodimio", "Prometio", "Samario", "Europio", "Gadolinio", "Terbio", "Disprosio", "Holmio", "Erbio", "Tulio", "Iterbio", "Lutecio", "Hafnio", "Tantalio", "Wolframio", "Renio", "Osmio", "Iridio", "Platino", "Oro", "Mercurio", "Talio", "Plomo", "Bismuto", "Polonio", "Astato", "Radon", "Francio", "Radio", "Actinio", "Torio", "Protactinio", "Uranio", "Neptunio", "Plutonio", "Americio", "Curio", "Berkelio", "Californio", "Einstenio", "Fermio", "Mendelevio", "Nobelio", "Laurencio", "Rutherfordio", "Dubnio", "Seaborgio", "Bohrio", "Hassio", "Meitnerio", "Darmstadtio", "Roentgenio", "Copernicio", "Nihonio", "Flerovio", "Moscovio", "Livermorio", "Teneso", "Oganeson"};
+    
+    static const char *groups_en[11] = {"alkali metal", "alkaline metal", "non-metal", "transition metal", "metalloid", "other metal", "halogen", "noble gas", "lanthanoid", "actinoid", "unknown"};
     static const char *groups_fr[11] = {"metal alcalin", "base alcalino-terre.", "non-metallique", "metal de transition", "metalloide", "autre metal", "halogene", "gaz rare", "lanthanide", "actinide", "inconnu"};
     static const char *groups_de[11] = {"alkalimetalen", "aardalkalimetalen", "niet-metalen", "overgangsmetaal", "metaloiden", "other metal", "halogenen", "edelgassen", "lanthaniden", "actiniden", "onbekend"};
+    static const char *groups_es[11] = {"alcalino", "alcalinoterreos", "no metal", "metal de transicion", "semimetal", "otro metal", "halogenos", "gas noble", "lantanido", "actinido", "desconocida"};
 
     const char** localizedStrings = strings_en;
     const char** localizedGroups = groups_en;
     const char** localizedElementNames = elementNames_en;
 
     switch ((int)system_info->language) {
-            case FRENCH_LOCAL:
+            case FR_LOCAL:
                 localizedStrings = strings_fr;
                 localizedGroups = groups_fr;
                 localizedElementNames = elementNames_fr;
                 break;
-            case DUTCH_LOCAL:
+            case DE_LOCAL:
                 localizedStrings = strings_de;
                 localizedGroups = groups_de;
                 localizedElementNames = elementNames_de;
+                break;
+            case ES_LOCAL:
+                localizedStrings = strings_es;
+                localizedGroups = groups_es;
+                localizedElementNames = elementNames_es;
                 break;
     }
     
