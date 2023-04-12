@@ -7,7 +7,7 @@
 #define DETAILS_SCREEN 0x0
 #define TABLE_SCREEN 0x1
 #define FR_LOCAL 0x10C
-#define DE_LOCAL 0x113
+#define NL_LOCAL 0x113
 #define ES_LOCAL 0x10A
 
 typedef struct
@@ -178,7 +178,7 @@ int main(void)
                 localizedGroups = groups_fr;
                 localizedElementNames = elementNames_fr;
                 break;
-            case DE_LOCAL:
+            case NL_LOCAL:
                 localizedStrings = strings_de;
                 localizedGroups = groups_de;
                 localizedElementNames = elementNames_de;
