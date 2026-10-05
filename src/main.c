@@ -214,7 +214,7 @@ int main(void)
     gfx_SetTextFGColor(255);
     gfx_SetTextBGColor(5);
     gfx_SetTextTransparentColor(5);
-    gfx_SetDrawScreen();
+    gfx_SetDrawBuffer();
     gfx_ZeroScreen();
     gfx_SetColor(224);
     gfx_FillRectangle_NoClip(295, 212, 20, 20);
@@ -408,6 +408,7 @@ int main(void)
         prevArrowKey = key;
         prevEnterKey = enterKey;
             
+        gfx_BlitBuffer();
     } while (kb_Data[1] != kb_Graph && kb_Data[6] != kb_Clear);
     
     gfx_End();
